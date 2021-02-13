@@ -1,0 +1,142 @@
+{
+	"info": {
+		"_postman_id": "52ac286d-2376-4a20-a2b6-409bafa69d71",
+		"name": "KamiToon",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Naomi",
+			"item": [
+				{
+					"name": "main",
+					"item": [
+						{
+							"name": "main",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}{{nextURL}}",
+									"host": [
+										"{{baseURL}}{{nextURL}}"
+									]
+								},
+								"description": "Check if API send anything."
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.variables.set('nextURL', '');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "v1",
+					"item": [
+						{
+							"name": "authentificates",
+							"item": [
+								{
+									"name": "register",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}{{nextURL}}/register",
+											"host": [
+												"{{baseURL}}{{nextURL}}"
+											],
+											"path": [
+												"register"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"const nextURL = pm.variables.get('nextURL');",
+											"pm.variables.set('nextURL', nextURL + '/authentificates');"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.variables.set('nextURL', '/v1');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.variables.set('baseURL', 'http://localhost:3000');"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}
