@@ -1,0 +1,11 @@
+{
+    "exclude": ["node_modules"],
+    "include": ["src/**/*"],
+    "compilerOptions": {
+        "lib": ["ES2015"],
+        "outDir": "dist",
+        "target": "ES2020",
+        "moduleResolution": "Node",
+        "module": "CommonJS",
+    }
+}
