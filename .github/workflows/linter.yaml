@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@master
       
       - name: Setuo node env 🏗
-        uses: actions/setup-nodes@v2.1.2
+        uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
         
