@@ -5,9 +5,10 @@ import {
 } from 'mongoose';
 
 export default new Schema({
-  user_id: {
+  user: {
     type: Schema.Types.ObjectId,
     require: true,
+    ref: 'User',
   },
   type: {
     type: Schema.Types.ObjectId,

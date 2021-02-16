@@ -9,7 +9,7 @@ import {
  * acceptCGU
  */
 
-export default new Schema({
+const users = new Schema({
   username: {
     type: String,
     require: true,
@@ -29,9 +29,24 @@ export default new Schema({
     default: 0,
   },
   webtoons: {
-    type: [Schema.Types.ObjectId],
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Webtoon'
+    }],
   },
   subscribes: {
-    type: [Schema.Types.ObjectId],
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+  },
+  timestamp: {
+    type: Date,
   },
 });
+
+users.path('username').get(function (username) {
+  return username + '#' + this.discriminator;
+});
+
+export default users;

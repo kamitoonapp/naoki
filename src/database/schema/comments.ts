@@ -5,13 +5,9 @@ import {
 } from 'mongoose';
 
 export default new Schema({
-  post_id: {
+  user: {
     type: Schema.Types.ObjectId,
-    require: true,
-    index: true,
-  },
-  user_id: {
-    type: Schema.Types.ObjectId,
+    ref: 'User',
   },
   content: {
     type: String,

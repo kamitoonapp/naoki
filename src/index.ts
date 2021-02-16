@@ -152,6 +152,7 @@ if (cluster.isWorker) {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
+    useFindAndModify: false,
   });
 
   mongoose.connection.on(

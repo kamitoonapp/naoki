@@ -9,4 +9,5 @@ export const jsonError = {
   1006: 'Incorrect password',
   1007: 'Too user has this username',
   1008: 'Duplicate data',
+  1009: 'Unknown user',
 };

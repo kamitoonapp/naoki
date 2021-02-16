@@ -5,9 +5,10 @@ import {
 } from 'mongoose';
 
 export default new Schema({
-  user_id: {
+  user: {
     type: Schema.Types.ObjectId,
     require: true,
+    ref: 'User',
   },
   email: {
     type: String,
@@ -26,5 +27,8 @@ export default new Schema({
   accept_cgu: {
     type: String,
     require: true,
+  },
+  timestamp: {
+    type: Date,
   },
 });

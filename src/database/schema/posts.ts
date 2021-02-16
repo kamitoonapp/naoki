@@ -5,10 +5,11 @@ import {
 } from 'mongoose';
 
 export default new Schema({
-  user_id: {
+  user: {
     type: Schema.Types.ObjectId,
     require: true,
     index: true,
+    ref: 'User',
   },
   content: {
     type: String,
@@ -17,9 +18,15 @@ export default new Schema({
     type: Date,
   },
   likedBy: {
-    type: [Schema.Types.ObjectId],
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    }],
   },
   comments: {
-    type: [Schema.Types.ObjectId],
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Comment',
+    }],
   },
 });

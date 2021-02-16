@@ -13,6 +13,9 @@
 					"item": [
 						{
 							"name": "main",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -56,9 +59,45 @@
 							"item": [
 								{
 									"name": "register",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "POST",
 										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "acceptCGU",
+													"value": "true",
+													"type": "text"
+												},
+												{
+													"key": "email",
+													"value": "shayn@test.fr",
+													"type": "text"
+												},
+												{
+													"key": "username",
+													"value": "shaynlink",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "azertyuiop1234",
+													"type": "text"
+												}
+											]
+										},
 										"url": {
 											"raw": "{{baseURL}}{{nextURL}}/register",
 											"host": [
@@ -66,6 +105,38 @@
 											],
 											"path": [
 												"register"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "login",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "email",
+													"value": "shayn@test.fr",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "azertyuiop1234",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{baseURL}}{{nextURL}}/login",
+											"host": [
+												"{{baseURL}}{{nextURL}}"
+											],
+											"path": [
+												"login"
 											]
 										}
 									},
@@ -80,6 +151,162 @@
 										"exec": [
 											"const nextURL = pm.variables.get('nextURL');",
 											"pm.variables.set('nextURL', nextURL + '/authentificates');"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "users",
+							"item": [
+								{
+									"name": "user",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}{{nextURL}}/:id",
+											"host": [
+												"{{baseURL}}{{nextURL}}"
+											],
+											"path": [
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "6027dfd52e33a52f6c213884"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "@me",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}{{nextURL}}/@me",
+											"host": [
+												"{{baseURL}}{{nextURL}}"
+											],
+											"path": [
+												"@me"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "@me",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "username",
+													"value": "Shaynll",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{baseURL}}{{nextURL}}/@me",
+											"host": [
+												"{{baseURL}}{{nextURL}}"
+											],
+											"path": [
+												"@me"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "webtoon",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}{{nextURL}}/webtoons/:id",
+											"host": [
+												"{{baseURL}}{{nextURL}}"
+											],
+											"path": [
+												"webtoons",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "webtoon",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}{{nextURL}}/webtoons/:id",
+											"host": [
+												"{{baseURL}}{{nextURL}}"
+											],
+											"path": [
+												"webtoons",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "apikey",
+								"apikey": [
+									{
+										"key": "value",
+										"value": "NjAyYWY5ODAwZmUxZGYyODg4OGI5MjNhLjM5Njk5MTI5MDMuMTAzNzY=",
+										"type": "string"
+									},
+									{
+										"key": "key",
+										"value": "Authorization",
+										"type": "string"
+									}
+								]
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"const nextURL = pm.variables.get('nextURL');",
+											"pm.variables.set('nextURL', nextURL + '/users');"
 										]
 									}
 								},

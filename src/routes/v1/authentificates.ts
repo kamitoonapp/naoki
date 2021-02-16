@@ -13,8 +13,17 @@ import {
   MongoError,
 } from 'mongodb';
 
+interface jsonErrors {
+  code: number;
+  message: string;
+  data?: any;
+}
+
 // eslint-disable-next-line new-cap
 const router = express.Router();
+
+// eslint-disable-next-line max-len
+const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/gi;
 
 let inc = 0;
 const epoch = Date.now() - Date.parse('01 Jan 2021 00:00:00 GMT');
@@ -63,7 +72,7 @@ function genDiscriminator(username: string): Promise<string> {
       const discriminator = getDiscriminator();
 
       const exist = await new Promise((_resolve) => {
-        mongoose.model('Users').exists({
+        mongoose.model('User').exists({
           username,
           discriminator,
         }, (err, exist) => {
@@ -84,7 +93,7 @@ router.use(express.json());
 router.use(express.urlencoded({extended: true}));
 
 router.post('/register', async (req, res) => {
-  const errors = [];
+  const errors: [jsonErrors?] = [];
 
   const data = {
     email: null,
@@ -100,8 +109,7 @@ router.post('/register', async (req, res) => {
     });
   } else data.acceptCGU = req.body.acceptCGU;
 
-  // eslint-disable-next-line max-len
-  if (/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/gi.test(req.body.email)) {
+  if (emailRegex.test(req.body.email)) {
     data.email = req.body.email;
   } else {
     errors.push({
@@ -153,8 +161,8 @@ router.post('/register', async (req, res) => {
 
   const token = genToken(userId.toHexString());
 
-  let auth = await mongoose.model('Authentificates').create({
-    user_id: userId,
+  let auth = await mongoose.model('Authentificate').create({
+    user: userId,
     email: data.email,
     password: data.password,
     accept_cgu: data.acceptCGU,
@@ -179,18 +187,76 @@ router.post('/register', async (req, res) => {
     }
   };
 
-  await mongoose.model('Users').create({
+  await mongoose.model('User').create({
+    _id: userId,
     username: data.username,
     discriminator,
   });
 
   return res.status(200).json({
-    _id: userId,
+    data: {
+      _id: userId,
+      email: data.email,
+      accept_cgu: data.acceptCGU,
+      token,
+      username: data.username,
+      discriminator,
+    },
+  });
+});
+
+router.post('/login', async (req, res) => {
+  const errors: [jsonErrors?] = [];
+
+  const data = {
+    email: null,
+    password: null,
+  };
+
+  if (req.body.email && emailRegex.test(req.body.email)) {
+    data.email = req.body.email;
+  } else {
+    errors.push({
+      code: 1004,
+      message: jsonError[1004],
+    });
+  };
+
+  if (req.body.password) {
+    data.password = createHash('sha256')
+        .update(req.body.password)
+        .digest('hex');
+  } else {
+    errors.push({
+      code: 1006,
+      message: jsonError[1006],
+    });
+  };
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      data: null,
+      errors,
+    });
+  };
+
+  const auth = await mongoose.model('Authentificate').findOne({
     email: data.email,
-    accept_cgu: data.acceptCGU,
-    token,
-    username: data.username,
-    discriminator,
+    password: data.password,
+  }, ['user', 'email', 'token']).populate('user').exec() as any;
+
+  if (!auth) {
+    return res.status(400).json({
+      data: null,
+      errors: [{
+        code: 1009,
+        message: jsonError[1009],
+      }],
+    });
+  };
+
+  return res.status(200).json({
+    data: auth,
   });
 });
 

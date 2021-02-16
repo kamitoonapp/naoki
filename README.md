@@ -17,4 +17,5 @@ yarn test
 ```
 
 # Utils
+- [Docs](https://github.com/kamitoonapp/naoki/tree/main/docs)
 - [API endpoints](https://github.com/kamitoonapp/naoki/tree/main/docs/endpoint.md)
