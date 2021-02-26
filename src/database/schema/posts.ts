@@ -7,15 +7,17 @@ import {
 export default new Schema({
   user: {
     type: Schema.Types.ObjectId,
-    require: true,
+    require: [true, 'User reference required'],
     index: true,
     ref: 'User',
   },
   content: {
     type: String,
+    maxLength: 3000,
   },
   timestamp: {
     type: Date,
+    default: Date.now,
   },
   likedBy: {
     type: [{

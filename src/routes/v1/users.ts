@@ -9,6 +9,7 @@ import * as mongoose from 'mongoose';
 // eslint-disable-next-line max-len
 const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/gi;
 
+// eslint-disable-next-line new-cap
 const router = express.Router();
 
 // Make body
@@ -17,19 +18,29 @@ router.use(express.urlencoded({extended: true}));
 
 router.use(async (req, res, next) => {
   // check credential
-  if (!req.headers.authorization) {
+  if (!res.locals.credentials) {
     return res.status(401).json({
       data: null,
       errors: [{
-        code: 1000,
-        message: jsonError[1000],
+        code: 1011,
+        message: jsonError[1011],
+      }],
+    });
+  };
+
+  if (res.locals.credentials?.type?.toLowerCase() != 'bearer') {
+    return res.status(401).json({
+      data: null,
+      errors: [{
+        code: 1010,
+        message: jsonError[1010],
       }],
     });
   };
 
   // Fetch user data (synchrenous with user Schema)
   res.locals.auth = await mongoose.model('Authentificate').findOne({
-    token: req.headers.authorization,
+    token: res.locals.credentials?.token,
   }, ['user', 'email']).populate('user').exec();
 
   // Check user data
@@ -75,7 +86,13 @@ router.get('/:id', async (req, res) => {
       .findById(id) as any;
 
   // check user data
-  if (!user) return res.status(404).json({data: null, errors: [{code: 1009, message: jsonError[1009]}]});
+  if (!user) {
+    return res.status(404).json({
+      data: null,
+      errors: [
+        {code: 1009, message: jsonError[1009]},
+      ]});
+  };
 
   // Send user data
   return res.status(200).json({data: user._doc});
@@ -129,7 +146,11 @@ router.patch('/@me', async (req, res) => {
 
   await mongoose.model('User').updateOne({_id: res.locals.auth.user._id}, data);
 
-  return res.status(200).json({data: {...Object.assign(res.locals.auth.user._doc, {...data}), email: res.locals.auth.email}});
+  return res.status(200).json({
+    data: {
+      ...Object.assign(res.locals.auth.user._doc, {...data}),
+      email: res.locals.auth.email,
+    }});
 });
 
 router.put('/webtoons/:id', async (req, res) => {

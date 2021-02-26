@@ -12,11 +12,18 @@ import {
 const users = new Schema({
   username: {
     type: String,
-    require: true,
+    require: [true, 'Username required'],
+    minLength: 1,
+    maxLength: 30,
+    trim: true,
   },
   discriminator: {
     type: String,
     require: true,
+    minlength: 5,
+    maxLength: 5,
+    trim: true,
+    match: /\d{5}/,
   },
   avatar: {
     type: String,
@@ -31,7 +38,7 @@ const users = new Schema({
   webtoons: {
     type: [{
       type: Schema.Types.ObjectId,
-      ref: 'Webtoon'
+      ref: 'Webtoon',
     }],
   },
   subscribes: {
@@ -42,11 +49,8 @@ const users = new Schema({
   },
   timestamp: {
     type: Date,
+    default: Date.now,
   },
-});
-
-users.path('username').get(function (username) {
-  return username + '#' + this.discriminator;
 });
 
 export default users;

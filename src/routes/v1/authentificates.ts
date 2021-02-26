@@ -12,6 +12,9 @@ import * as cluster from 'cluster';
 import {
   MongoError,
 } from 'mongodb';
+import {
+  emailRegex,
+} from './../../util/regex';
 
 interface jsonErrors {
   code: number;
@@ -21,9 +24,6 @@ interface jsonErrors {
 
 // eslint-disable-next-line new-cap
 const router = express.Router();
-
-// eslint-disable-next-line max-len
-const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/gi;
 
 let inc = 0;
 const epoch = Date.now() - Date.parse('01 Jan 2021 00:00:00 GMT');
@@ -102,7 +102,7 @@ router.post('/register', async (req, res) => {
     username: null,
   };
 
-  if (req.body.acceptCGU != 'true') {
+  if (typeof parseFloat(req.body.acceptCGU) != 'number') {
     errors.push({
       code: 1002,
       message: jsonError[1002],
@@ -165,12 +165,11 @@ router.post('/register', async (req, res) => {
     user: userId,
     email: data.email,
     password: data.password,
-    accept_cgu: data.acceptCGU,
+    accept_cgu: parseFloat(data.acceptCGU),
     token,
   }).catch((e) => e) as any;
 
-
-  if (auth instanceof MongoError) {
+  if (auth instanceof MongoError || auth instanceof Error) {
     auth = auth as any;
     if (auth.code == 11000) {
       return res.status(400).json({
@@ -183,7 +182,7 @@ router.post('/register', async (req, res) => {
       });
     } else {
       console.error(auth);
-      return res.status(500).end();
+      return res.status(400).end(auth._message);
     }
   };
 
